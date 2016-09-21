@@ -90,3 +90,40 @@ SELECT COUNT(*) FROM clean_nom_log_json ;
 
 
 
+
+SELECT eventId,counter FROM (
+select evTbl.eventId, count(evTbl.eventId) as counter FROM (SELECT eventId FROM clean_nom_log_json) AS evTbl GROUP BY evTbl.eventId
+) as tbl  WHERE counter = 1 LIMIT 10;
+
+
+
+
+
+
+
+SELECT siteid, adid
+FROM clean_nom_log_json LATERAL VIEW explode(clean_nom_log_json.meta.locations) adTable AS adid LIMIT 10;
+
+
+
+
+create table test_view as 
+SELECT 
+year(FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-mm-dd'))) AS year,
+month(FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-mm-dd'))) AS month,
+day(FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-mm-dd'))) AS day,
+serverTs, 
+siteid, 
+name AS enentName, 
+location,
+pseudoEvenent,
+uaGroup
+FROM clean_nom_log_json LATERAL VIEW explode(clean_nom_log_json.meta.locations) adTable AS location 
+LATERAL VIEW explode(clean_nom_log_json.meta.pseudoevents) abTable AS pseudoEvenent 
+LATERAL VIEW explode(clean_nom_log_json.meta.ua.groups) acTable AS uaGroup 
+;
+
+
+
+
+
