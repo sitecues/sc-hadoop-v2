@@ -40,7 +40,7 @@ printMSG "Checking for non-tmp gz files in local directory ${SOURCE_DIR}" ;
 WROTE_TMP=1;
 
 #Ensure the tmp file is removed
-trap "echo 'cleaning up' ; if [[ ${WROTE_TMP} = 0 ]]; then rm ${SOURCE_DIR}/working.txt ; fi" INT
+trap "echo 'cleaning up ${SOURCE_DIR}' ; if [[ ${WROTE_TMP} = 0 ]]; then rm ${SOURCE_DIR}/working.txt ; fi" INT
 
 function waitIfFileExists() {
  local WORKING_FILE="${1}"
@@ -52,19 +52,30 @@ function waitIfFileExists() {
  fi;
 }
 
-pushd ${SOURCE_DIR}
+pushd ${SOURCE_DIR} > /dev/null ;
  waitIfFileExists "${SOURCE_DIR}/working.txt" 10 ;
  echo "${SOURCE}" >> "${SOURCE_DIR}/working.txt" ;
+ WROTE_TMP=0;
 ls
  ls *.gz | grep -v tmp | while read line ; do 
     gzip -t ${line} ; 
     if [[ ${?} = 0 ]] ; then 
-     echo "Tested ${line} Result IS VALID GZ"
+     printMSG "Tested ${line} Result IS VALID GZ. Continuing with s3 sync."
      s3cmd --verbose sync "${SOURCE_DIR}/${line}" "${S3_DEST_DIR}/" ;
+     if [[ ${?} = 0 ]]; then 
+      printMSG "Successfully synced ${SOURCE_DIR}/${line} to ${S3_DEST_DIR}/ Continuing."
+     else
+      printMSG "ERROR syncing ${SOURCE_DIR}/${line} to ${S3_DEST_DIR}/ FAILING."
+      rm "${SOURCE_DIR}/working.txt" ;
+      popd > /dev/null;
+      printFooter ;
+      exit 1;
+     fi
     else
-     echo "Tested ${line} Result IS NOT VALID GZ. Aborting transfer."
+     printMSG "Tested ${line} Result IS NOT VALID GZ. Aborting transfer."
     fi
  done ; 
  rm "${SOURCE_DIR}/working.txt" ;
-popd;
+popd > /dev/null ;
+
 printFooter ;
