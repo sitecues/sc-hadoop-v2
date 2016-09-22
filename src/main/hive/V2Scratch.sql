@@ -1,3 +1,5 @@
+-- Brian's scratch pad of ideas
+
 DROP TABLE IF EXISTS clean_nom_log;
 DROP TABLE IF EXISTS optomized_clean_nom_log;
 DROP TABLE IF EXISTS optimized_clean_nom_log;

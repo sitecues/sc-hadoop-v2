@@ -1,3 +1,4 @@
+-- Put at the top of every job
 SET hive.input.format=org.apache.hadoop.hive.ql.io.HiveCombineSplitsInputFormat;
 SET mapred.min.split.size=200000000;
 SET hive.merge.mapfiles=true ;
