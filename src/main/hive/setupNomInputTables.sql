@@ -1,3 +1,4 @@
+-- Create clean_nom_log_json and check data for consistency. Works off of clean metrics data.
 
 -- Clean up any crap from dev
 DROP TABLE IF EXISTS clean_nom_log;
