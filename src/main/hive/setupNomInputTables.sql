@@ -105,7 +105,7 @@ CREATE EXTERNAL TABLE clean_nom_log_json
     clientTimeMs BIGINT,
     details STRUCT< 
         isRetina : BOOLEAN,
-        nativeZoom : DOUBLE
+        nativeZoom : FLOAT
     >,
     eventId STRING,
     meta STRUCT <
@@ -125,7 +125,7 @@ CREATE EXTERNAL TABLE clean_nom_log_json
     siteId STRING,
     ttsState  BOOLEAN,
     userId STRING,
-    zoomLevel DOUBLE
+    zoomLevel FLOAT
 ) ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 location 's3://data.sitecues.com/telem/hive/clean_nom_log_json' ;
 
