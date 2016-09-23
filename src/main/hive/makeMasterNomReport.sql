@@ -1,3 +1,5 @@
+-- Brian's scratchpad --
+
 SELECT 
 raw_master_log_meta.filename , 
 raw_master_log_meta.linecount,

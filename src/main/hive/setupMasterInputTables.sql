@@ -1,3 +1,5 @@
+-- This works of the raw (as opposed to clean) input table so that we can cross-check with the output of
+-- setupNomInputTables.sql which works off of clean data
 
 -- -----------------------------------------------------------------------------
 -- SET UP THE MASTER TABLE
