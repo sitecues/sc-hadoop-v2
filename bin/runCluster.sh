@@ -51,5 +51,15 @@ printMSG "CLUSTER_NAME=${CLUSTER_NAME}"
 printMSG "HIVE_SCRIPT_NAME=${HIVE_SCRIPT_NAME}"
 
 
+
+
 #TERMINATE="--auto-terminate" ;
-aws emr create-cluster ${TERMINATE} --applications Name=Hadoop Name=Hive Name=Pig Name=Hue --tags "${CLUSTER_TAGS}" --ec2-attributes "${EC2_ATTRIBITES}"  --service-role ${SERVICE_ROLE} --enable-debugging --release-label "${RELEASE_LABEL}" --log-uri "${S3N_LOG_URI}" --name "${CLUSTER_NAME}" --instance-groups "${INSTANCE_GROUPS}" --region ${EC2_REGION} --steps "${STEPS}"
+#INSTALL_JSON_SERDE='--bootstrap-action Path=file:/usr/lib/bigtop-utils/s3get,Args=["--src=s3://prd.emr.sitecues.com/serde/json-serde-1.3.7-jar-with-dependencies.jar --dst=/usr/lib/hive/lib/"]'
+
+INSTALL_JSON_SERDE='[{"Path": "file:/usr/bin/sudo","Args": [" /usr/share/aws/emr/scripts/s3get --src=s3://prd.emr.sitecues.com/serde/json-serde-1.3.7-jar-with-dependencies.jar --dst=/usr/lib/hive/lib/"],"Name": "INSTALL_JSON_SERDE"}]' ;
+
+
+
+
+
+aws emr create-cluster ${TERMINATE} --applications Name=Hadoop Name=Hive Name=Pig Name=Hue --tags "${CLUSTER_TAGS}" --ec2-attributes "${EC2_ATTRIBITES}"  --service-role ${SERVICE_ROLE} --enable-debugging --release-label "${RELEASE_LABEL}" --log-uri "${S3N_LOG_URI}" --name "${CLUSTER_NAME}" --instance-groups "${INSTANCE_GROUPS}" --region ${EC2_REGION} --steps "${STEPS}" --bootstrap-action  "${INSTALL_JSON_SERDE}" ;

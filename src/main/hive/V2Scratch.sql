@@ -104,17 +104,14 @@ select evTbl.eventId, count(evTbl.eventId) as counter FROM (SELECT eventId FROM 
 SELECT siteid, adid
 FROM clean_nom_log_json LATERAL VIEW explode(clean_nom_log_json.meta.locations) adTable AS adid LIMIT 10;
 
-
-
-
-create table test_view as 
+create table test_view_clean_nom_explosion AS SEQUENCEFILE AS
 SELECT 
 year(FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-mm-dd'))) AS year,
 month(FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-mm-dd'))) AS month,
 day(FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-mm-dd'))) AS day,
 serverTs, 
 siteid, 
-name AS enentName, 
+name AS eventName, 
 location,
 pseudoEvenent,
 uaGroup
@@ -122,6 +119,43 @@ FROM clean_nom_log_json LATERAL VIEW explode(clean_nom_log_json.meta.locations) 
 LATERAL VIEW explode(clean_nom_log_json.meta.pseudoevents) abTable AS pseudoEvenent 
 LATERAL VIEW explode(clean_nom_log_json.meta.ua.groups) acTable AS uaGroup 
 ;
+
+-- Extract the raw data necessary to audit ids and sessionize
+CREATE TABLE clean_nom_id_audit_stage_001 STORED AS SEQUENCEFILE AS
+SELECT
+ YEAR(unixTs) AS year,
+ MONTH(unixTs) AS month,
+ DAY(unixTs) AS day,
+ HOUR(unixTs) AS hour,
+ MINUTE(unixTs) AS minute,
+ SECOND(unixTs) AS second,
+ siteid,
+ userId,
+ sessionId,
+ pageViewId,
+ eventName
+FROM (
+ SELECT 
+  FROM_UNIXTIME(UNIX_TIMESTAMP(FROM_UNIXTIME(CEIL(serverTs/1000)), 'yyyy-MM-dd HH:mm:ss')) AS unixTs
+  siteid, 
+  userId,
+  sessionId,
+  pageViewId
+  name AS eventName
+ FROM clean_nom_log_json 
+)tbl;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
