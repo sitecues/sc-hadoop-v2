@@ -11,10 +11,12 @@ DROP TABLE IF EXISTS clean_nom_log_meta;
 DROP TABLE IF EXISTS clean_nom_log_event_counts;
 
 -- -----------------------------------------------------------------------------
--- SET up a table where each row is simply a single entry with a json string representing a single event
+-- Overlay a table onto the existing data at nom/clean, where each row 
+-- is simply a single entry with a json string representing a single event
 -- * clean_nom_log - gzipped *
 DROP TABLE IF EXISTS clean_nom_log;
-CREATE EXTERNAL TABLE clean_nom_log (line string) location 's3://data.sitecues.com/telem/nom/clean/';
+CREATE EXTERNAL TABLE clean_nom_log (line STRING) 
+LOCATION 's3://data.sitecues.com/telem/nom/clean/';
 
 -- -----------------------------------------------------------------------------
 -- Set up optimized_clean_nom_log (an optomized version of the clean_nom_log table)
@@ -128,7 +130,7 @@ CREATE EXTERNAL TABLE clean_nom_log_json
     userId STRING,
     zoomLevel FLOAT
 ) ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
-location 's3://data.sitecues.com/telem/hive/clean_nom_log_json' ;
+    LOCATION 's3://data.sitecues.com/telem/hive/clean_nom_log_json' ;
 
 -- -----------------------------------------------------------------------------
 -- CHECK CONSISTENCY OF 
@@ -138,7 +140,7 @@ CREATE EXTERNAL TABLE is_optimized_clean_nom_log_and_clean_nom_log_json_consiste
  jsonCount BIGINT,
  isConsistent BOOLEAN
 ) STORED AS TEXTFILE 
-location 's3://data.sitecues.com/telem/hive/is_optimized_clean_nom_log_and_clean_nom_log_json_consistent' ;
+LOCATION 's3://data.sitecues.com/telem/hive/is_optimized_clean_nom_log_and_clean_nom_log_json_consistent' ;
 INSERT OVERWRITE TABLE is_optimized_clean_nom_log_and_clean_nom_log_json_consistent
 SELECT 
  optimized_clean_nom_logCount AS optomizedCount,
