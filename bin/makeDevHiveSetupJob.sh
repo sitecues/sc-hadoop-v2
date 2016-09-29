@@ -28,6 +28,6 @@ LOCAL_HIVE_BASE="${PROJECT_HOME}/src/main/hive";
 
 cat "${LOCAL_HIVE_BASE}/stdHeader.sql" ;
 echo '' ;
-cat "${LOCAL_HIVE_BASE}/setupMasterInputTables.sql" ;
+#cat "${LOCAL_HIVE_BASE}/setupMasterInputTables.sql" ;
 echo '' ;
 cat "${LOCAL_HIVE_BASE}/setupNomInputTables.sql" ;

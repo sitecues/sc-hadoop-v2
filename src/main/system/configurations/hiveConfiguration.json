@@ -1,0 +1,8 @@
+[
+    {
+      "Classification": "hive-site",
+      "Properties": {
+        "hive.aux.jars.path": "s3://"
+      }
+    }
+  ]
