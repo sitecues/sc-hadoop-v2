@@ -36,9 +36,16 @@ SERVICE_ROLE="EMR_DefaultRole" ;
 
 RELEASE_LABEL="emr-5.0.0" ;
 
-S3N_LOG_URI='s3n://aws-logs-573289937126-us-east-1/elasticmapreduce/' ; 
+S3N_LOG_URI='s3n://aws-logs-573289937126-us-east-1/elasticmapreduce/' ;
 
-INSTANCE_GROUPS='[{"InstanceCount":3,"InstanceGroupType":"CORE","InstanceType":"m3.xlarge","Name":"Core instance group - 2"},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"m3.xlarge","Name":"Master instance group - 1"}]'
+NUM_NODES=17;
+
+INSTANCE_GROUPS='[{"InstanceCount":'${NUM_NODES}',"InstanceGroupType":"CORE","InstanceType":"m3.2xlarge","Name":"Core instance group - 2"},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"m3.xlarge","Name":"Master instance group - 1"}]'
+
+#INSTANCE_GROUPS='[{"InstanceCount":'${NUM_NODES}',"EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":500,"VolumeType":"gp2"},"VolumesPerInstance":2}],"EbsOptimized":true},"InstanceGroupType":"CORE","InstanceType":"m3.xlarge","Name":"Core instance group - 2"},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"m3.xlarge","Name":"Master instance group - 1"}]'
+
+#INSTANCE_GROUPS='[{"InstanceCount":'${NUM_NODES}',"InstanceGroupType":"CORE","InstanceType":"m3.xlarge","Name":"Core instance group - 2","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":500,"VolumeType":"gp2"},"VolumesPerInstance":2}],"EbsOptimized":false}},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"m3.xlarge","Name":"Master instance group - 1"}]'
+
 
 EC2_REGION="us-east-1"
 
@@ -46,9 +53,6 @@ CLUSTER_NAME="${1}" ;
 HIVE_SCRIPT_NAME="${2}" ;
 
 STEPS='[{"Name":"S3DistCp SERDE step","Args":["s3-dist-cp","--s3Endpoint=s3.amazonaws.com","--src=s3://prd.emr.sitecues.com/serde/","--dest=hdfs:///user/hive/aux_jars","--srcPattern=.*.jar"],"ActionOnFailure":"CONTINUE","Type":"CUSTOM_JAR","Jar":"command-runner.jar"},{"Args":["hive-script","--run-hive-script","--args","-f","'"${HIVE_SCRIPT_NAME}"'","--verbose","","-d","OUTPUT=s3://output"],"Type":"CUSTOM_JAR","ActionOnFailure":"CONTINUE","Jar":"command-runner.jar","Properties":"","Name":"Hive program"}]' 
-
-
-
 
 
 
@@ -63,4 +67,7 @@ printMSG "HIVE_SCRIPT_NAME=${HIVE_SCRIPT_NAME}"
 
 INSTALL_JSON_SERDE='[{"Path": "s3://prd.emr.sitecues.com/scripts/bootstrap/installJSONSerde.sh","Name": "INSTALL_JSON_SERDE"}]' ;
 
-aws emr create-cluster ${TERMINATE} --applications Name=Hadoop Name=Hive Name=Pig Name=Hue --tags "${CLUSTER_TAGS}" --ec2-attributes "${EC2_ATTRIBITES}"  --service-role ${SERVICE_ROLE} --enable-debugging --release-label "${RELEASE_LABEL}" --log-uri "${S3N_LOG_URI}" --name "${CLUSTER_NAME}" --instance-groups "${INSTANCE_GROUPS}" --region ${EC2_REGION}  --configurations '[{"Classification": "hive-site","Properties": {"hive.aux.jars.path": "/user/hive/aux_jars/json-serde-1.3.7-jar-with-dependencies.jar"}}]'  --steps "${STEPS}"   ; #--bootstrap-action  "${INSTALL_JSON_SERDE}" ; #   
+aws emr create-cluster ${TERMINATE} --applications Name=Hadoop Name=Hive Name=Pig Name=Hue --tags "${CLUSTER_TAGS}" --ec2-attributes "${EC2_ATTRIBITES}"  --service-role ${SERVICE_ROLE} --enable-debugging --release-label "${RELEASE_LABEL}" --log-uri "${S3N_LOG_URI}" --name "${CLUSTER_NAME}" --instance-groups "${INSTANCE_GROUPS}" --region ${EC2_REGION}  --configurations '[{"Classification": "hive-site","Properties": {"hive.aux.jars.path": "/user/hive/aux_jars/json-serde-1.3.7-jar-with-dependencies.jar"}}]'  ;#--steps "${STEPS}"   ; #--bootstrap-action  "${INSTALL_JSON_SERDE}" ; #   
+
+#--instance-groups '[{"InstanceCount":2,"EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":500,"VolumeType":"gp2"},"VolumesPerInstance":2}],"EbsOptimized":false},"InstanceGroupType":"CORE","InstanceType":"m3.xlarge","Name":"Core instance group - 2"},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"m3.xlarge","Name":"Master instance group - 1"}]' --region us-east-1
+
